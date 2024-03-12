@@ -39,14 +39,7 @@ public class NitrateFragment extends Fragment {
 
         binding = FragmentNitrateBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        final TextView titleView = binding.titleNitrate;
         final TableLayout tableLayout = binding.tableNitrateLevel;
-
-        titleView.setGravity(Gravity.CENTER);
-        titleView.setTextSize(20);
-        titleView.setTextColor(Color.BLACK);
-        titleView.setPadding(0, 0, 0, 30);
-        titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
 
         nitrateViewModel.getNitrateDataList().observe(getViewLifecycleOwner(), nitrateDataList -> {
             // Clear the table
