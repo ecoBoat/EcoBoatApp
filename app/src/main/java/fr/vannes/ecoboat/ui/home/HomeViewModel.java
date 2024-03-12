@@ -19,7 +19,6 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<Integer> mIndex;
     private final MutableLiveData<String> mWaterQualityText; // New LiveData for water quality text
     private final MutableLiveData<String> mLocation;
-
     private final Handler handler = new Handler();
     private final Runnable updateDateRunnable = new Runnable() {
         @Override
@@ -30,6 +29,9 @@ public class HomeViewModel extends ViewModel {
     };
 
 
+    /**
+     * Constructor for the HomeViewModel
+     */
     public HomeViewModel() {
         mText = new MutableLiveData<>();
         String text = "Qualité de l'eau en ce moment :\n";
@@ -71,6 +73,7 @@ public class HomeViewModel extends ViewModel {
 
     }
 
+    // Those public methods are used to get the LiveData from the Fragment
     public LiveData<String> getText() {
         return mText;
     }
@@ -97,6 +100,9 @@ public class HomeViewModel extends ViewModel {
         return sdf.format(new Date());
     }
 
+    /**
+     * Update the date in the LiveData
+     */
     private void updateDate() {
         String text = "Qualité de l'eau en ce moment :\n";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -105,6 +111,9 @@ public class HomeViewModel extends ViewModel {
         mText.setValue(text);
     }
 
+    /**
+     * Stop the updates when the ViewModel is cleared
+     */
     @Override
     protected void onCleared() {
         super.onCleared();
