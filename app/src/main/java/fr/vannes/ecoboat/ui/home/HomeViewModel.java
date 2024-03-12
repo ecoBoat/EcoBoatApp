@@ -1,6 +1,7 @@
 package fr.vannes.ecoboat.ui.home;
 
 import android.os.Build;
+import android.os.Handler;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class HomeViewModel extends ViewModel {
 
@@ -17,6 +19,16 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<Integer> mIndex;
     private final MutableLiveData<String> mWaterQualityText; // New LiveData for water quality text
     private final MutableLiveData<String> mLocation;
+
+    private final Handler handler = new Handler();
+    private final Runnable updateDateRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateDate();
+            handler.postDelayed(this, TimeUnit.MINUTES.toMillis(1)); // Update the date every minute
+        }
+    };
+
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
@@ -28,13 +40,13 @@ public class HomeViewModel extends ViewModel {
 
         mIndex = new MutableLiveData<>();
         // TODO Change this value with the API value
-        mIndex.setValue(30);
+        mIndex.setValue(75);
 
         mWaterQualityText = new MutableLiveData<>(); // Initialize the new LiveData
 
         // Update the water quality text when the index value changes
         Integer indexValue = mIndex.getValue();
-        if (indexValue == null) {
+        if (indexValue == null || indexValue < 0 || indexValue > 100) {
             indexValue = 0; // Default value
         }
 
@@ -54,6 +66,8 @@ public class HomeViewModel extends ViewModel {
 
         // TODO Change this value with the API value
         mLocation.setValue("Vannes, Morbihan, France");
+
+        handler.post(updateDateRunnable);
 
     }
 
@@ -81,5 +95,19 @@ public class HomeViewModel extends ViewModel {
     private String getCurrentDateFormatted() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.FRANCE);
         return sdf.format(new Date());
+    }
+
+    private void updateDate() {
+        String text = "Qualité de l'eau en ce moment :\n";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            text += " " + getCurrentDateFormatted();
+        }
+        mText.setValue(text);
+    }
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        handler.removeCallbacks(updateDateRunnable); // Stop the updates when the ViewModel is cleared
     }
 }
