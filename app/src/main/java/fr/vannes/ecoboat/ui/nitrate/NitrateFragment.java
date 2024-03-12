@@ -4,6 +4,7 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,12 +39,38 @@ public class NitrateFragment extends Fragment {
 
         binding = FragmentNitrateBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
+        final TextView titleView = binding.titleNitrate;
         final TableLayout tableLayout = binding.tableNitrateLevel;
+
+        titleView.setGravity(Gravity.CENTER);
+        titleView.setTextSize(20);
+        titleView.setTextColor(Color.BLACK);
+        titleView.setPadding(0, 0, 0, 30);
+        titleView.setTypeface(titleView.getTypeface(), Typeface.BOLD);
+
         nitrateViewModel.getNitrateDataList().observe(getViewLifecycleOwner(), nitrateDataList -> {
             // Clear the table
             tableLayout.removeAllViews();
 
+            // Create header row
+            final TableRow headerRow = new TableRow(getContext());
+            headerRow.setGravity(Gravity.CENTER);
+            String[] headers = {"Heure", "Taux"};
+            for (String header : headers) {
+                TextView headerCell = new TextView(getContext());
+                headerCell.setText(header);
+                headerCell.setTextSize(16);
+                headerCell.setTextColor(Color.BLACK);
+                headerCell.setGravity(Gravity.CENTER);
+                headerCell.setPadding(100, 8, 100, 8);
+                headerCell.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.cell_border));
+                headerRow.addView(headerCell);
+
+                TableRow.LayoutParams params = new TableRow.LayoutParams();
+                params.setMargins(10, 10, 10, 30); // marge de 10dp
+                headerCell.setLayoutParams(params);
+            }
+            tableLayout.addView(headerRow);
             // Add rows to the table
             for (String nitrateData : nitrateDataList) {
                 TableRow row = new TableRow(getContext());

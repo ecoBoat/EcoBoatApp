@@ -11,5 +11,6 @@
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <string name="menu_nitrate">Taux de nitrate</string>
-    <string name="taux_de_nitrates">Taux de nitrates</string>
+    <string name="taux_de_nitrates">Taux</string>
+    <string name="taux_de_nitrates_par_heure">Taux de nitrates par heure</string>
 </resources>
