@@ -16,6 +16,7 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<String> mText;
     private final MutableLiveData<Integer> mIndex;
     private final MutableLiveData<String> mWaterQualityText; // New LiveData for water quality text
+    private final MutableLiveData<String> mLocation;
 
     public HomeViewModel() {
         mText = new MutableLiveData<>();
@@ -27,7 +28,7 @@ public class HomeViewModel extends ViewModel {
 
         mIndex = new MutableLiveData<>();
         // TODO Change this value with the API value
-        mIndex.setValue(21);
+        mIndex.setValue(30);
 
         mWaterQualityText = new MutableLiveData<>(); // Initialize the new LiveData
 
@@ -49,6 +50,11 @@ public class HomeViewModel extends ViewModel {
             mWaterQualityText.setValue("Qualité de l'eau : Excellente");
         }
 
+        mLocation = new MutableLiveData<>();
+
+        // TODO Change this value with the API value
+        mLocation.setValue("Vannes, Morbihan, France");
+
     }
 
     public LiveData<String> getText() {
@@ -61,6 +67,10 @@ public class HomeViewModel extends ViewModel {
 
     public LiveData<String> getWaterQualityText() { // Getter for the new LiveData
         return mWaterQualityText;
+    }
+
+    public LiveData<String> getLocation() {
+        return mLocation;
     }
 
     /**

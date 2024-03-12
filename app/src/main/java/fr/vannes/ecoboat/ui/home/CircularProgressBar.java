@@ -55,12 +55,36 @@ public class CircularProgressBar extends View {
         canvas.drawArc(cx - innerRadius, cy - innerRadius, cx + innerRadius, cy + innerRadius,
                 180, sweepAngle, false, paint);
 
+        // Draw the needle
+        double angle = Math.toRadians(sweepAngle + 180); // Adjust the angle to start from the top of the circle
+        float needleLengthFactor = 0.8f; // Reduce the needle length by 20%
+        float needleX = cx + (float) (innerRadius * Math.cos(angle) * needleLengthFactor);
+        float needleY = cy + (float) (innerRadius * Math.sin(angle) * needleLengthFactor);
+        paint.setColor(0xFF000000); // Black color
+        canvas.drawLine(cx, cy, needleX, needleY, paint);
+
         // Draw the progress text
         paint.setColor(0xFF000000); // Black color
         paint.setTextSize(80);
         String progressText = String.valueOf(progress);
         float textWidth = paint.measureText(progressText);
-        canvas.drawText(progressText, cx - textWidth / 2, cy + 10, paint);
+
+        // Draw background
+        float textHeight = paint.descent() - paint.ascent();
+        float textOffset = (textHeight / 2) - paint.descent();
+        float backgroundMargin = 10f; // Adjust this value to change the background size
+        float left = cx - textWidth / 2 - backgroundMargin;
+        float top = cy - textOffset - backgroundMargin;
+        float right = cx + textWidth / 2 + backgroundMargin;
+        float bottom = cy + textOffset + backgroundMargin;
+        paint.setColor(0xFFFFFFFF); // White color for the background
+        canvas.drawRect(left, top, right, bottom, paint);
+
+        // Draw text over the background
+        paint.setColor(0xFF000000); // Black color
+        canvas.drawText(progressText, cx - textWidth / 2, cy + textOffset, paint);
+
+
     }
 
     public void setProgress(int progress) {

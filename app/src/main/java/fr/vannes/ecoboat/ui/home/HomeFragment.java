@@ -38,6 +38,11 @@ public class HomeFragment extends Fragment {
             waterQualityTextView.setText(waterQualityText);
         });
 
+        homeViewModel.getLocation().observe(getViewLifecycleOwner(), location -> {
+            TextView locationTextView = binding.locationText;
+            locationTextView.setText(location);
+        });
+
         return root;
     }
 
