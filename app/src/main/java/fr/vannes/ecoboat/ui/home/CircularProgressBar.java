@@ -9,28 +9,46 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * Custom view to draw a circular progress bar.
+ */
 public class CircularProgressBar extends View {
 
-    private int mIndex = 0;
+    // Initialize the progress value
     private int progress = 0;
+    // Initialize the Paint object
     private final Paint paint = new Paint();
 
+    /**
+     * Constructor for the CircularProgressBar
+     * @param context The Context the view is running in, through which it can access the current theme, resources, etc.
+     * @param attrs The attributes of the XML tag that is inflating the view.
+     */
     public CircularProgressBar(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         paint.setStrokeWidth(10);
         paint.setStyle(Paint.Style.STROKE);
     }
 
+    /**
+     * This method is called when the view should render its content.
+     * @param canvas The canvas on which the background will be drawn
+     */
     @Override
-    protected void onDraw(Canvas canvas) {
+    protected void onDraw(@NonNull Canvas canvas) {
+        // Call the superclass method
         super.onDraw(canvas);
+
+        // Get the width and height of the view
         int width = getWidth();
         int height = getHeight();
+        // Get the radius of the circle
         int radius = Math.min(width, height) / 2 - 10;
+        // Get the center of the view
         int cx = width / 2;
         int cy = height / 2;
 
-        // Draw the outer half circle
+        // Draw the outer circle
         paint.setColor(0xFF000000); // Black color
         canvas.drawArc(cx - radius, cy - radius, cx + radius, cy + radius,
                 360, 360, false, paint);
@@ -51,6 +69,7 @@ public class CircularProgressBar extends View {
             paint.setColor(0xFF007FFF); // Blue color
         }
 
+        // Draw the inner half circle based on the progress value
         float sweepAngle = (float) progress / 100 * 180;
         canvas.drawArc(cx - innerRadius, cy - innerRadius, cx + innerRadius, cy + innerRadius,
                 180, sweepAngle, false, paint);
@@ -84,9 +103,12 @@ public class CircularProgressBar extends View {
         paint.setColor(0xFF000000); // Black color
         canvas.drawText(progressText, cx - textWidth / 2, cy + textOffset, paint);
 
-
     }
 
+    /**
+     * Setter for the progress value
+     * @param progress The new progress value
+     */
     public void setProgress(int progress) {
         this.progress = progress;
         invalidate(); // Redraw the view
