@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +27,17 @@ public class HomeFragment extends Fragment {
 
         final TextView textView = binding.textHome;
         homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+
+        homeViewModel.getIndex().observe(getViewLifecycleOwner(), index -> {
+            CircularProgressBar circularProgressBar = binding.circularProgressBar;
+            circularProgressBar.setProgress(index);
+        });
+
+        homeViewModel.getWaterQualityText().observe(getViewLifecycleOwner(), waterQualityText -> {
+            TextView waterQualityTextView = binding.waterQualityText;
+            waterQualityTextView.setText(waterQualityText);
+        });
+
         return root;
     }
 
