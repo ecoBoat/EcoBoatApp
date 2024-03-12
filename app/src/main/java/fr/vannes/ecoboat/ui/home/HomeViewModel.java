@@ -8,18 +8,26 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * ViewModel for the home fragment.
+ */
 public class HomeViewModel extends ViewModel {
 
+    // Live data to store the text
     private final MutableLiveData<String> mText;
+    // Live data to store the index
     private final MutableLiveData<Integer> mIndex;
-    private final MutableLiveData<String> mWaterQualityText; // New LiveData for water quality text
+    // LiveData for water quality text
+    private final MutableLiveData<String> mWaterQualityText;
+    // LiveData for location
     private final MutableLiveData<String> mLocation;
+    // Defining a Handler to manage messages and tasks on the main (UI) thread.
     private final Handler handler = new Handler();
+    // Runnable to update the date every minute
     private final Runnable updateDateRunnable = new Runnable() {
         @Override
         public void run() {
@@ -73,19 +81,34 @@ public class HomeViewModel extends ViewModel {
 
     }
 
-    // Those public methods are used to get the LiveData from the Fragment
+    /**
+     * Getter for the text
+     * @return the LiveData of the text
+     */
     public LiveData<String> getText() {
         return mText;
     }
 
+    /**
+     * Getter for the index
+     * @return the LiveData of the index
+     */
     public LiveData<Integer> getIndex() {
         return mIndex;
     }
 
+    /**
+     * Getter for the water quality text
+     * @return the LiveData of the water quality text
+     */
     public LiveData<String> getWaterQualityText() { // Getter for the new LiveData
         return mWaterQualityText;
     }
 
+    /**
+     * Getter for the location
+     * @return the LiveData of the location
+     */
     public LiveData<String> getLocation() {
         return mLocation;
     }
