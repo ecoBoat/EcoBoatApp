@@ -47,6 +47,7 @@ public class APIUtils {
 
     /**
      * Method to get the token to access the API
+     *
      * @return The token
      * @throws IOException If the token cannot be retrieved
      */
@@ -58,53 +59,78 @@ public class APIUtils {
     }
 
     /**
+     * Method to get the data from the API
+     *
+     * @param url The URL to get the data from
+     * @param keys The keys to get from the data
+     * @return The data
+     * @throws IOException If the data cannot be retrieved
+     */
+    public List<Map<String, String>> getData(String url, String... keys) throws IOException {
+        String token = getToken();
+        Request request = new Request.Builder()
+                .url(apiUrl + url)
+                .header("Authorization", "Bearer " + token)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+            assert response.body() != null;
+            String responseBody = response.body().string();
+
+            Map<String, Object> map = gson.fromJson(responseBody, HashMap.class);
+            if (map.containsKey("data")) {
+                List<Map<String, Object>> dataList = (List<Map<String, Object>>) map.get("data");
+                assert dataList != null;
+                if (!dataList.isEmpty()) {
+                    List<Map<String, String>> results = new ArrayList<>();
+                    for (Map<String, Object> data : dataList) {
+                        Map<String, String> result = new HashMap<>();
+                        for (String key : keys) {
+                            if (data.containsKey(key)) {
+                                result.put(key, String.valueOf(data.get(key)));
+                            }
+                        }
+                        if (!result.isEmpty()) {
+                            results.add(result);
+                        }
+                    }
+                    return results;
+                } else {
+                    throw new IOException("Data list is empty");
+                }
+            } else {
+                throw new IOException("Data not found in response");
+            }
+        }
+    }
+
+    /**
      * Method to get the temperature data from the API
+     *
      * @return The temperature data
      * @throws IOException If the temperature data cannot be retrieved
      */
     public List<Map<String, String>> getTemperature() throws IOException {
-    String token = getToken();
-    Request request = new Request.Builder()
-            .url(apiUrl + "/capteurs/capteur_temperature/")
-            .header("Authorization", "Bearer " + token)
-            .build();
-
-    try (Response response = client.newCall(request).execute()) {
-        if (!response.isSuccessful()) {
-            throw new IOException("Unexpected code " + response);
-        }
-        assert response.body() != null;
-        String responseBody = response.body().string();
-
-        Map<String, Object> map = gson.fromJson(responseBody, HashMap.class);
-        if(map.containsKey("data")) {
-            List<Map<String, Object>> dataList = (List<Map<String, Object>>) map.get("data");
-            assert dataList != null;
-            if(!dataList.isEmpty()) {
-                List<Map<String, String>> results = new ArrayList<>();
-                for(Map<String, Object> data : dataList) {
-                    if (data.containsKey("temperature") && data.containsKey("created")) {
-                        String temperature = String.valueOf(data.get("temperature"));
-                        String created = String.valueOf(data.get("created"));
-                        Map<String, String> tempAndCreated = new HashMap<>();
-                        tempAndCreated.put("Temperature", temperature);
-                        tempAndCreated.put("Created", created);
-                        results.add(tempAndCreated);
-                    }
-                }
-                return results;
-            } else {
-                throw new IOException("Data list is empty");
-            }
-        } else {
-            throw new IOException("Data not found in response");
-        }
+        return getData("/capteurs/capteur_temperature/", "temperature", "created");
     }
-}
+
+    /**
+     * Method to get the pH data from the API
+     *
+     * @return The pH data
+     * @throws IOException If the pH data cannot be retrieved
+     */
+    public List<Map<String, String>> getpH() throws IOException {
+        return getData("/capteurs/capteur_acidite/", "pH", "created");
+    }
 
 
     /**
      * Method to check if the token is expired
+     *
      * @return True if the token is expired, false otherwise
      */
     private boolean isTokenExpired() {
@@ -115,66 +141,65 @@ public class APIUtils {
 
     /**
      * Method to refresh the token if it is expired
+     *
      * @throws IOException If the token cannot be refreshed
      */
     private void refreshToken() throws IOException {
-    System.out.println("Refreshing token...");
+        System.out.println("Refreshing token...");
 
-    // Create the request body with the username and password
-    Map<String, String> credentials = new HashMap<>();
-    // Add the username and password to the map
-    credentials.put("username", username);
-    credentials.put("password", password);
-    // Convert the map to JSON
-    String jsonCredentials = gson.toJson(credentials);
+        // Create the request body with the username and password
+        Map<String, String> credentials = new HashMap<>();
+        // Add the username and password to the map
+        credentials.put("username", username);
+        credentials.put("password", password);
+        // Convert the map to JSON
+        String jsonCredentials = gson.toJson(credentials);
 
-    // Create the request body
-    RequestBody body = RequestBody.create(
-            jsonCredentials,
-            MediaType.parse("application/json; charset=utf-8")
-    );
+        // Create the request body
+        RequestBody body = RequestBody.create(
+                jsonCredentials,
+                MediaType.parse("application/json; charset=utf-8")
+        );
 
-    // Create the request
-    Request request = new Request.Builder()
-            .url(apiUrl + "/login")
-            .post(body)
-            .build();
+        // Create the request
+        Request request = new Request.Builder()
+                .url(apiUrl + "/login")
+                .post(body)
+                .build();
 
 
-    System.out.println("Sending request to " + apiUrl + "/login");
+        System.out.println("Sending request to " + apiUrl + "/login");
 
-    // Send the request
-    try (Response response = client.newCall(request).execute()) {
-        // Check if the response is successful
-        if(!response.isSuccessful()) {
-            throw new IOException("Unexpected code " + response);
+        // Send the request
+        try (Response response = client.newCall(request).execute()) {
+            // Check if the response is successful
+            if (!response.isSuccessful()) {
+                throw new IOException("Unexpected code " + response);
+            }
+
+            // Get the response body
+            assert response.body() != null;
+            String responseBody = response.body().string();
+
+            // Print the response
+            System.out.println("Received response: " + responseBody);
+
+            // Parse the response
+            Map<String, Object> map = gson.fromJson(responseBody, HashMap.class);
+            if (map.containsKey("token")) {
+                token = (String) map.get("token");
+                tokenReceivedTime = System.currentTimeMillis();
+                System.out.println("Token: " + token);
+                System.out.println("Message: " + map.get("messsage")); // Print the message
+                System.out.println("Data: " + map.get("data")); // Print the user data
+            } else {
+                throw new IOException("Token not found in response");
+            }
+        } catch (IOException e) {
+            System.out.println("An error occurred: " + e.getMessage());
+            throw e;
         }
-
-        // Get the response body
-        assert response.body() != null;
-        String responseBody = response.body().string();
-
-        // Print the response
-        System.out.println("Received response: " + responseBody);
-
-        // Parse the response
-        Map<String, Object> map = gson.fromJson(responseBody, HashMap.class);
-        if(map.containsKey("token")) {
-            token = (String) map.get("token");
-            tokenReceivedTime = System.currentTimeMillis();
-            System.out.println("Token: " + token);
-            System.out.println("Message: " + map.get("messsage")); // Print the message
-            System.out.println("Data: " + map.get("data")); // Print the user data
-        } else {
-            throw new IOException("Token not found in response");
-        }
-    } catch (IOException e) {
-        System.out.println("An error occurred: " + e.getMessage());
-        throw e;
     }
-}
-
-
 
 
 }

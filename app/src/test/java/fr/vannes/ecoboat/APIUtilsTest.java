@@ -58,4 +58,20 @@ public class APIUtilsTest {
                 fail("Exception should not be thrown");
             }
         }
+
+        @Test
+        public void testGetpH(){
+            APIUtils apiUtils = new APIUtils();
+            try {
+                List<Map<String, String>> pH = apiUtils.getpH();
+                for (Map<String, String> ph : pH) {
+                    assertNotNull("pH should not be null", ph);
+                    System.out.println(ph);
+                }
+
+                assertNotNull("pH should not be null", pH);
+            } catch (IOException e) {
+                fail("Exception should not be thrown");
+            }
+        }
     }
