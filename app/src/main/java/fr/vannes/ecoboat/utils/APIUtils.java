@@ -10,7 +10,9 @@ import okhttp3.Response;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -54,6 +56,52 @@ public class APIUtils {
         }
         return token;
     }
+
+    /**
+     * Method to get the temperature data from the API
+     * @return The temperature data
+     * @throws IOException If the temperature data cannot be retrieved
+     */
+    public List<Map<String, String>> getTemperature() throws IOException {
+    String token = getToken();
+    Request request = new Request.Builder()
+            .url(apiUrl + "/capteurs/capteur_temperature/")
+            .header("Authorization", "Bearer " + token)
+            .build();
+
+    try (Response response = client.newCall(request).execute()) {
+        if (!response.isSuccessful()) {
+            throw new IOException("Unexpected code " + response);
+        }
+        assert response.body() != null;
+        String responseBody = response.body().string();
+
+        Map<String, Object> map = gson.fromJson(responseBody, HashMap.class);
+        if(map.containsKey("data")) {
+            List<Map<String, Object>> dataList = (List<Map<String, Object>>) map.get("data");
+            assert dataList != null;
+            if(!dataList.isEmpty()) {
+                List<Map<String, String>> results = new ArrayList<>();
+                for(Map<String, Object> data : dataList) {
+                    if (data.containsKey("temperature") && data.containsKey("created")) {
+                        String temperature = String.valueOf(data.get("temperature"));
+                        String created = String.valueOf(data.get("created"));
+                        Map<String, String> tempAndCreated = new HashMap<>();
+                        tempAndCreated.put("Temperature", temperature);
+                        tempAndCreated.put("Created", created);
+                        results.add(tempAndCreated);
+                    }
+                }
+                return results;
+            } else {
+                throw new IOException("Data list is empty");
+            }
+        } else {
+            throw new IOException("Data not found in response");
+        }
+    }
+}
+
 
     /**
      * Method to check if the token is expired
@@ -125,6 +173,7 @@ public class APIUtils {
         throw e;
     }
 }
+
 
 
 
