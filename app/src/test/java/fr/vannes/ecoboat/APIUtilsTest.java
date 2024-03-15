@@ -10,6 +10,9 @@ import java.util.Map;
 
 import fr.vannes.ecoboat.utils.APIUtils;
 
+/**
+ * Unit API tests
+ */
 public class APIUtilsTest {
     @Test
     public void testGetTokenWithMock() {

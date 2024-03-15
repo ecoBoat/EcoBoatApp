@@ -50,7 +50,7 @@ public class HomeViewModel extends ViewModel {
 
         mIndex = new MutableLiveData<>();
         // TODO Change this value with the API value
-        mIndex.setValue(75);
+        mIndex.setValue(35);
 
         mWaterQualityText = new MutableLiveData<>(); // Initialize the new LiveData
 

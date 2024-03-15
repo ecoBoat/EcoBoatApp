@@ -114,7 +114,7 @@ public class APIUtils {
      * @throws IOException If the temperature data cannot be retrieved
      */
     public List<Map<String, String>> getTemperature() throws IOException {
-        return getData("/capteurs/capteur_temperature/", "temperature", "created");
+        return getData("/capteurs/capteur_temperature", "temperature", "created");
     }
 
     /**
