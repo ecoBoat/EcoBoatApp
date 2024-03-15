@@ -20,5 +20,9 @@
             android:id="@+id/nav_nitrate"
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_nitrate" />
+        <item
+            android:id="@+id/nav_temperature"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/menu_temperature" />
     </group>
 </menu>
