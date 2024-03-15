@@ -62,4 +62,5 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.mockito:mockito-core:3.12.4")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
