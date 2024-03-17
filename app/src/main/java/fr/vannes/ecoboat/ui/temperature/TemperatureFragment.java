@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.vannes.ecoboat.databinding.FragmentTemperatureBinding;
+import fr.vannes.ecoboat.utils.ChartUtils;
 
 /**
  * Fragment to display the temperature.
@@ -80,27 +81,7 @@ public class TemperatureFragment extends Fragment {
         // Observe the LiveData from the TemperatureViewModel
         temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperature -> {
             // Create the entries for the LineChart
-            List<Entry> entries = new ArrayList<>();
-            // For each temperature value, create an entry
-            for (Map<String, String> temp : temperature) {
-                // If the Android version is Oreo or higher
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    // Get the date of the temperature
-                    String dateString = Objects.requireNonNull(temp.get("created"));
-                    // Create an Instant from the date
-                    Instant instantCreated = Instant.parse(dateString);
-                    // Get the current date
-                    Instant instantNow = Instant.now();
-                    // Calculate the difference in seconds between the current date and the date of the temperature
-                    long differenceInSeconds = instantNow.getEpochSecond() - instantCreated.getEpochSecond();
-                    // Calculate the difference in minutes
-                    float differenceInMinutes = differenceInSeconds / 60.0f;
-                    // Get the temperature value
-                    float yValue = Float.parseFloat(Objects.requireNonNull(temp.get("temperature")));
-                    // Add the entry to the entries list
-                    entries.add(new Entry(differenceInMinutes, yValue));
-                }
-            }
+            List<Entry> entries = ChartUtils.createEntries(temperature, "created", "temperature");
 
             Log.d("TemperatureFragment", "Temperature entries created: " + entries);
 

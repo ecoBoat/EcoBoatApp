@@ -27,6 +27,7 @@ import java.util.Objects;
 
 import fr.vannes.ecoboat.R;
 import fr.vannes.ecoboat.databinding.FragmentPhBinding;
+import fr.vannes.ecoboat.utils.ChartUtils;
 
 public class PhFragment extends Fragment {
 
@@ -67,26 +68,7 @@ public class PhFragment extends Fragment {
         // Observe the LiveData from the PhViewModel
         phViewModel.getPh().observe(getViewLifecycleOwner(), ph -> {
             // Create the entries for the LineChart
-            List<Entry> entries = new ArrayList<>();
-            // For each pH value, create an entry
-            for (Map<String, String> map : ph) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    // Get the date of the pH value
-                    String dateString = Objects.requireNonNull(map.get("created"));
-                    // Create an Instant from the date
-                    Instant instantCreated = Instant.parse(dateString);
-                    // Get the current date
-                    Instant instantNow = Instant.now();
-                    // Calculate the difference in seconds between the current date and the date of the temperature
-                    long differenceInSeconds = instantNow.getEpochSecond() - instantCreated.getEpochSecond();
-                    // Calculate the difference in minutes
-                    float differenceInMinutes = differenceInSeconds / 60.0f;
-                    // Get the temperature value
-                    float yValue = Float.parseFloat(Objects.requireNonNull(map.get("pH")));
-                    // Add the entry to the entries list
-                    entries.add(new Entry(differenceInMinutes, yValue));
-                }
-            }
+            List<Entry> entries = ChartUtils.createEntries(ph, "created", "pH");
 
             Log.d("TemperatureFragment", "Temperature entries created: " + entries);
 
