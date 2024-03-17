@@ -80,7 +80,7 @@ public class TemperatureFragment extends Fragment {
 
         // Observe the LiveData from the TemperatureViewModel
         temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperature -> {
-            // Create the entries for the LineChart
+            // Create the entries for the LineChart by calling the createEntries method from the ChartUtils class
             List<Entry> entries = ChartUtils.createEntries(temperature, "created", "temperature");
 
             Log.d("TemperatureFragment", "Temperature entries created: " + entries);

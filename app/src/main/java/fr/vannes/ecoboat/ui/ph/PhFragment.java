@@ -43,6 +43,18 @@ public class PhFragment extends Fragment {
         return new PhFragment();
     }
 
+    /**
+     * Method to create the view of the fragment
+     *
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
+     * @return The view of the fragment
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
@@ -67,7 +79,7 @@ public class PhFragment extends Fragment {
 
         // Observe the LiveData from the PhViewModel
         phViewModel.getPh().observe(getViewLifecycleOwner(), ph -> {
-            // Create the entries for the LineChart
+            // Create the entries for the LineChart by calling the createEntries method from the ChartUtils class
             List<Entry> entries = ChartUtils.createEntries(ph, "created", "pH");
 
             Log.d("TemperatureFragment", "Temperature entries created: " + entries);
