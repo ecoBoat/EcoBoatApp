@@ -95,6 +95,7 @@ public class PhFragment extends Fragment {
         });
 
         // Button to fefresh the temperature data
+        binding.refreshButton.setBackgroundResource(R.drawable.cell_border);
         binding.refreshButton.setOnClickListener(v -> {
             try {
                 phViewModel.fetchPh();

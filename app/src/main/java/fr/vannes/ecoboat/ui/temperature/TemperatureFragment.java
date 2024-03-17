@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import fr.vannes.ecoboat.R;
 import fr.vannes.ecoboat.databinding.FragmentTemperatureBinding;
 import fr.vannes.ecoboat.utils.APIUtils;
 import fr.vannes.ecoboat.utils.ChartUtils;
@@ -98,6 +99,7 @@ public class TemperatureFragment extends Fragment {
         });
 
         // Button to fefresh the temperature data
+        binding.refreshButton.setBackgroundResource(R.drawable.cell_border);
         binding.refreshButton.setOnClickListener(v -> {
             try {
                 temperatureViewModel.fetchTemperature();
