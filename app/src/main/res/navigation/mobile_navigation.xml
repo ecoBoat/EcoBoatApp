@@ -12,17 +12,6 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="fr.vannes.ecoboat.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
-
-    <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="fr.vannes.ecoboat.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
-    <fragment
         android:id="@+id/nav_nitrate"
         android:name="fr.vannes.ecoboat.ui.nitrate.NitrateFragment"
         android:label="@string/menu_nitrate"
@@ -32,4 +21,9 @@
         android:name="fr.vannes.ecoboat.ui.temperature.TemperatureFragment"
         android:label="@string/menu_temperature"
         tools:layout="@layout/fragment_temperature" />
+    <fragment
+        android:id="@+id/nav_ph"
+        android:name="fr.vannes.ecoboat.ui.ph.PhFragment"
+        android:label="@string/menu_ph"
+        tools:layout="@layout/fragment_ph" />
 </navigation>

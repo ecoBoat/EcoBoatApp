@@ -61,13 +61,10 @@ public class TemperatureViewModel extends ViewModel {
             List<Map<String, String>> temperature = apiUtils.getTemperature();
 
             // Create a new Handler to update the LiveData on the main thread
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    // Update the LiveData with the temperature
-                    mTemperature.setValue(temperature);
-                    Log.d("TemperatureViewModel", "Temperature data fetched: " + temperature);
-                }
+            new Handler(Looper.getMainLooper()).post(() -> {
+                // Update the LiveData with the temperature
+                mTemperature.setValue(temperature);
+                Log.d("TemperatureViewModel", "Temperature data fetched: " + temperature);
             });
         } catch (Exception e) {
             Log.e("TemperatureViewModel", "Error fetching temperature data", e);
