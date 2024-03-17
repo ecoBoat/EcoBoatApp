@@ -39,6 +39,7 @@ public class TemperatureViewModel extends ViewModel {
 
     /**
      * Method to get the text attribute
+     *
      * @return The text attribute
      */
     public MutableLiveData<String> getText() {
@@ -47,6 +48,7 @@ public class TemperatureViewModel extends ViewModel {
 
     /**
      * Method to get the subtitle attribute
+     *
      * @return The subtitle attribute
      */
     public MutableLiveData<String> getSubtitle() {
@@ -56,6 +58,7 @@ public class TemperatureViewModel extends ViewModel {
 
     /**
      * Method to get the temperature attribute
+     *
      * @return The temperature attribute
      */
     public MutableLiveData<List<Map<String, String>>> getTemperature() {
@@ -67,24 +70,34 @@ public class TemperatureViewModel extends ViewModel {
      * with the APIUtils getTemperature method
      */
     protected void fetchTemperature() {
-    // Create a new thread to fetch the temperature from the API
-    new Thread(() -> {
-        APIUtils apiUtils = new APIUtils();
-        try {
-            // Get the temperature from the API
-            List<Map<String, String>> temperature = apiUtils.getTemperature();
+        // Create a new thread to fetch the temperature from the API
+        new Thread(() -> {
+            APIUtils apiUtils = new APIUtils();
+            try {
+                // Get the temperature from the API
+                List<Map<String, String>> temperature = apiUtils.getTemperature();
 
-            // Create a new Handler to update the LiveData on the main thread
-            new Handler(Looper.getMainLooper()).post(() -> {
-                // Update the LiveData with the temperature
-                mTemperature.setValue(temperature);
-                Log.d("TemperatureViewModel", "Temperature data fetched: " + temperature);
-            });
-        } catch (Exception e) {
-            Log.e("TemperatureViewModel", "Error fetching temperature data", e);
+                // Create a new Handler to update the LiveData on the main thread
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    // Update the LiveData with the temperature
+                    mTemperature.setValue(temperature);
+                    Log.d("TemperatureViewModel", "Temperature data fetched: " + temperature);
+                });
+            } catch (Exception e) {
+                Log.e("TemperatureViewModel", "Error fetching temperature data", e);
+            }
+        }).start();
+
+
+    }
+
+    public Map<String, String> getFirstTemperatureEntry() {
+        List<Map<String, String>> temperatureList = mTemperature.getValue();
+        if (temperatureList != null && !temperatureList.isEmpty()) {
+            return temperatureList.get(0);
         }
-    }).start();
-}
+        return null;
+    }
 
 
 }

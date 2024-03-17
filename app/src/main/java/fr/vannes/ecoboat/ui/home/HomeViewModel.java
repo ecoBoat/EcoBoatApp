@@ -77,6 +77,8 @@ public class HomeViewModel extends ViewModel {
         // TODO Change this value with the API value
         mLocation.setValue("Vannes, Morbihan, France");
 
+
+
         handler.post(updateDateRunnable);
 
     }

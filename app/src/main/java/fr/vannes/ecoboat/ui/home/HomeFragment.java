@@ -11,7 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.util.Map;
+
+import fr.vannes.ecoboat.R;
 import fr.vannes.ecoboat.databinding.FragmentHomeBinding;
+import fr.vannes.ecoboat.ui.nitrate.NitrateViewModel;
+import fr.vannes.ecoboat.ui.ph.PhViewModel;
+import fr.vannes.ecoboat.ui.temperature.TemperatureViewModel;
 
 public class HomeFragment extends Fragment {
 
@@ -34,6 +40,18 @@ public class HomeFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
                 new ViewModelProvider(this).get(HomeViewModel.class);
+
+        // Link the NitrateViewModel, TemperatureViewModel and PhViewModel to the HomeFragment's layout
+        NitrateViewModel nitrateViewModel =
+                new ViewModelProvider(this).get(NitrateViewModel.class);
+        TemperatureViewModel temperatureViewModel =
+                new ViewModelProvider(this).get(TemperatureViewModel.class);
+
+
+
+        PhViewModel phViewModel =
+                new ViewModelProvider(this).get(PhViewModel.class);
+
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
@@ -62,6 +80,22 @@ public class HomeFragment extends Fragment {
             locationTextView.setText(location);
         });
 
+
+// Observe the temperature data
+temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperatureList -> {
+    if (temperatureList != null && !temperatureList.isEmpty()) {
+        Map<String, String> firstTemperatureEntry = temperatureList.get(0);
+        String temperatureValue = firstTemperatureEntry.get("temperature");
+        TextView temperatureTextView = binding.temperatureText;
+        // Use resource string with placeholder
+        String temperatureText = getString(R.string.temperature_text, temperatureValue);
+        temperatureTextView.setText(temperatureText);
+    } else {
+        TextView temperatureTextView = binding.temperatureText;
+        String temperatureText = getString(R.string.temperature_text, "N/A");
+        temperatureTextView.setText(temperatureText);
+    }
+});
         // Return the root view
         return root;
     }
