@@ -59,7 +59,7 @@ public class TemperatureFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // Create a TemperatureViewModel
+        // Call the ViewModelProvider to create a new instance of the TemperatureViewModel
         TemperatureViewModel temperatureViewModel =
                 new ViewModelProvider(this).get(TemperatureViewModel.class);
 
@@ -71,6 +71,9 @@ public class TemperatureFragment extends Fragment {
         final TextView textView = binding.textTemperature;
         temperatureViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
+        final TextView subtitleView = binding.chartLabel;
+        temperatureViewModel.getSubtitle().observe(getViewLifecycleOwner(), subtitleView::setText);
+
         // Create the LineChart
         final LineChart lineChart = binding.chart;
 
@@ -78,7 +81,7 @@ public class TemperatureFragment extends Fragment {
         temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperature -> {
             // Create the entries for the LineChart
             List<Entry> entries = new ArrayList<>();
-            // For each temperature, create an entry
+            // For each temperature value, create an entry
             for (Map<String, String> temp : temperature) {
                 // If the Android version is Oreo or higher
                 if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {

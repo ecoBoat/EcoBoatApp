@@ -18,6 +18,8 @@ import fr.vannes.ecoboat.utils.APIUtils;
 public class TemperatureViewModel extends ViewModel {
     // Text attribute to display the fragment title
     private final MutableLiveData<String> mText;
+    // Text attribute to display the subtitle
+    private final MutableLiveData<String> mSubtitle;
     // Temperature attribute to display the temperature
     private final MutableLiveData<List<Map<String, String>>> mTemperature;
 
@@ -27,6 +29,9 @@ public class TemperatureViewModel extends ViewModel {
     public TemperatureViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("Derniers relevés de température");
+
+        mSubtitle = new MutableLiveData<>();
+        mSubtitle.setValue("Derniers relevés de température (en minutes écoulées)");
 
         mTemperature = new MutableLiveData<>();
         fetchTemperature();
@@ -39,6 +44,15 @@ public class TemperatureViewModel extends ViewModel {
     public MutableLiveData<String> getText() {
         return mText;
     }
+
+    /**
+     * Method to get the subtitle attribute
+     * @return The subtitle attribute
+     */
+    public MutableLiveData<String> getSubtitle() {
+        return mSubtitle;
+    }
+
 
     /**
      * Method to get the temperature attribute
