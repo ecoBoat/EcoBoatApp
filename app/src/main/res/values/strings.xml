@@ -11,6 +11,7 @@
     <string name="menu_nitrate">Taux de nitrate</string>
     <string name="menu_temperature">Température</string>
     <string name="menu_ph">pH</string>
+    <string name="update">Mettre à jour</string>
 
 
 </resources>

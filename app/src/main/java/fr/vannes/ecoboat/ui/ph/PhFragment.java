@@ -94,6 +94,15 @@ public class PhFragment extends Fragment {
             Log.d("TemperatureFragment", "Chart data set and invalidated");
         });
 
+        // Button to fefresh the temperature data
+        binding.refreshButton.setOnClickListener(v -> {
+            try {
+                phViewModel.fetchPh();
+            } catch (Exception e) {
+                Log.e("PhFragment", "Error fetching pH data: " + e);
+            }
+        });
+
 
         return root;
     }

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import fr.vannes.ecoboat.databinding.FragmentTemperatureBinding;
+import fr.vannes.ecoboat.utils.APIUtils;
 import fr.vannes.ecoboat.utils.ChartUtils;
 
 /**
@@ -38,6 +39,7 @@ public class TemperatureFragment extends Fragment {
 
     /**
      * Method to create a new instance of the TemperatureFragment
+     *
      * @return The new instance of the TemperatureFragment
      */
     public static TemperatureFragment newInstance() {
@@ -46,14 +48,14 @@ public class TemperatureFragment extends Fragment {
 
     /**
      * Method to create the view of the fragment
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
      *
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
      * @return The view of the fragment
      */
     @Override
@@ -93,6 +95,15 @@ public class TemperatureFragment extends Fragment {
             lineChart.invalidate();
 
             Log.d("TemperatureFragment", "Chart data set and invalidated");
+        });
+
+        // Button to fefresh the temperature data
+        binding.refreshButton.setOnClickListener(v -> {
+            try {
+                temperatureViewModel.fetchTemperature();
+            } catch (Exception e) {
+                Log.e("TemperatureFragment", "Error fetching temperature data: " + e);
+            }
         });
 
         // Return the view of the fragment

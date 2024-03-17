@@ -66,7 +66,7 @@ public class PhViewModel extends ViewModel {
      * Method to fetch the pH from the API
      * with the APIUtils getpH method
      */
-    private void fetchPh() {
+    protected void fetchPh() {
         // Create a new thread to fetch the pH from the API
         new Thread(() -> {
             // Get the pH from the API
