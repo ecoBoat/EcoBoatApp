@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,14 @@ import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import fr.vannes.ecoboat.R;
 import fr.vannes.ecoboat.databinding.FragmentNitrateBinding;
@@ -28,6 +37,15 @@ public class NitrateFragment extends Fragment {
 
     // Link the NitrateViewModel to the NitrateFragment's layout
     private FragmentNitrateBinding binding;
+
+    /**
+     * Method to create a new instance of the NitrateFragment
+     *
+     * @return The new instance of the NitrateFragment
+     */
+    public static NitrateFragment newInstance() {
+        return new NitrateFragment();
+    }
 
 
     /**
@@ -42,74 +60,68 @@ public class NitrateFragment extends Fragment {
      *
      * @return Return the View for the fragment's UI, or null.
      */
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+@Override
+public View onCreateView(@NonNull LayoutInflater inflater,
+                         @Nullable ViewGroup container,
+                         @Nullable Bundle savedInstanceState) {
 
-        // Create a NitrateViewModel
-        NitrateViewModel nitrateViewModel =
-                new ViewModelProvider(this).get(NitrateViewModel.class);
+    // Call the ViewModelProvider to create a new instance of the NitrateViewModel
+    NitrateViewModel nitrateViewModel =
+            new ViewModelProvider(this).get(NitrateViewModel.class);
 
-        // Inflate the layout for this fragment
-        binding = FragmentNitrateBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-        final TableLayout tableLayout = binding.tableNitrateLevel;
+    // Inflate the layout for this fragment
+    binding = FragmentNitrateBinding.inflate(inflater, container, false);
+    View root = binding.getRoot();
 
-        // Observe the LiveData from the NitrateViewModel
-        nitrateViewModel.getNitrateDataList().observe(getViewLifecycleOwner(), nitrateDataList -> {
-            // Clear the table
-            tableLayout.removeAllViews();
+    // Observe the LiveData from the NitrateViewModel
+    final TextView textView = binding.textNitrate;
+    nitrateViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
 
-            // Create header row
-            final TableRow headerRow = new TableRow(getContext());
-            headerRow.setGravity(Gravity.CENTER);
-            String[] headers = {"Heure", "Taux"};
-            // Loop through the headers
-            for (String header : headers) {
-                TextView headerCell = new TextView(getContext());
-                headerCell.setText(header);
-                headerCell.setTextSize(16);
-                headerCell.setTextColor(Color.BLACK);
-                headerCell.setGravity(Gravity.CENTER);
-                headerCell.setPadding(100, 8, 100, 8);
-                headerCell.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.cell_border));
-                headerRow.addView(headerCell);
+    final TextView textViewSubtitle = binding.chartLabel;
+    nitrateViewModel.getSubtitle().observe(getViewLifecycleOwner(), textViewSubtitle::setText);
 
-                TableRow.LayoutParams params = new TableRow.LayoutParams();
-                params.setMargins(10, 10, 10, 30); // marge de 10dp
-                headerCell.setLayoutParams(params);
-            }
-            // Add the header row to the table
-            tableLayout.addView(headerRow);
+    // Create the LineChart
+    final LineChart lineChart = binding.chart;
 
-            // Loop through the nitrate data list
-            for (String nitrateData : nitrateDataList) {
-                TableRow row = new TableRow(getContext());
-                row.setGravity(Gravity.CENTER);
-                // Split the nitrate data
-                String[] parts = nitrateData.split(" : ");
-                for (String part : parts) {
-                    TextView cell = new TextView(getContext());
-                    cell.setGravity(Gravity.END);
-                    cell.setText(part);
-                    cell.setTextSize(16);
-                    cell.setTextColor(Color.BLACK);
-                    cell.setPadding(100, 8, 100, 8);
-                    cell.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.cell_border));
-
-                    TableRow.LayoutParams params = new TableRow.LayoutParams();
-                    params.setMargins(10, 10, 10, 10);
-                    cell.setLayoutParams(params);
-                    row.addView(cell);
-                }
-                // Add the row to the table
-                tableLayout.addView(row);
-            }
-        });
-        // Return the root view
-        return root;
+// Observe the LiveData from the NitrateViewModel
+nitrateViewModel.getNitrate().observe(getViewLifecycleOwner(), nitrate -> {
+    Log.d("NitrateFragment", "Received nitrate data: " + nitrate);
+    // Create the entries for the LineChart
+    List<Entry> entries = new ArrayList<>();
+    for (int i = 0; i < nitrate.size(); i++) {
+        // Convert the nitrate value to a float
+        float nitrateValue = Float.parseFloat(nitrate.get(i));
+        // Create a new entry with the nitrate value and add it to the entries list
+        entries.add(new Entry(i, nitrateValue));
     }
 
+    Log.d("NitrateFragment", "Nitrate entries created: " + entries);
+
+    // Create the LineDataSet and LineData
+    LineDataSet lineDataSet = new LineDataSet(entries, "Nitrate");
+    LineData lineData = new LineData(lineDataSet);
+    // Set the LineData to the LineChart
+    lineChart.setData(lineData);
+    lineChart.invalidate();
+
+    Log.d("NitrateFragment", "Chart data set and invalidated");
+});
+
+// Button to refresh the nitrate data
+binding.refreshButton.setBackgroundResource(R.drawable.cell_border);
+binding.refreshButton.setOnClickListener(v -> {
+    try {
+        Log.d("NitrateFragment", "Refresh button clicked, fetching nitrate data");
+        nitrateViewModel.fetchNitrate();
+    } catch (Exception e) {
+        Log.e("NitrateFragment", "Error fetching nitrate data: " + e);
+    }
+});
+
+
+    // Return the root view
+    return root;
+}
     /**
      * This method is called when the fragment is destroyed.
      */
