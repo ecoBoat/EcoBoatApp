@@ -91,13 +91,5 @@ public class TemperatureViewModel extends ViewModel {
 
     }
 
-    public Map<String, String> getFirstTemperatureEntry() {
-        List<Map<String, String>> temperatureList = mTemperature.getValue();
-        if (temperatureList != null && !temperatureList.isEmpty()) {
-            return temperatureList.get(0);
-        }
-        return null;
-    }
-
 
 }

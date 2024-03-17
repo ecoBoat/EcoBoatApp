@@ -98,7 +98,7 @@ public class TemperatureFragment extends Fragment {
             Log.d("TemperatureFragment", "Chart data set and invalidated");
         });
 
-        // Button to fefresh the temperature data
+        // Button to refresh the temperature data
         binding.refreshButton.setBackgroundResource(R.drawable.cell_border);
         binding.refreshButton.setOnClickListener(v -> {
             try {

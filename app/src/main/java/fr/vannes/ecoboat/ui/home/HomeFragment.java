@@ -26,14 +26,14 @@ public class HomeFragment extends Fragment {
 
     /**
      * This method is called when the fragment is created.
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment,
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
      *
+     * @param inflater           The LayoutInflater object that can be used to inflate
+     *                           any views in the fragment,
+     * @param container          If non-null, this is the parent view that the fragment's
+     *                           UI should be attached to.  The fragment should not add the view itself,
+     *                           but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
      * @return Return the View for the fragment's UI, or null.
      */
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,7 +46,6 @@ public class HomeFragment extends Fragment {
                 new ViewModelProvider(this).get(NitrateViewModel.class);
         TemperatureViewModel temperatureViewModel =
                 new ViewModelProvider(this).get(TemperatureViewModel.class);
-
 
 
         PhViewModel phViewModel =
@@ -80,22 +79,54 @@ public class HomeFragment extends Fragment {
             locationTextView.setText(location);
         });
 
+        // Observe the nitrate data
+        nitrateViewModel.getNitrate().observe(getViewLifecycleOwner(), nitrateList -> {
+            if (nitrateList != null && !nitrateList.isEmpty()) {
+                String firstNitrateValue = nitrateList.get(0);
+                TextView nitrateTextView = binding.nitrateText;
+                // Use resource string with placeholder
+                String nitrateText = getString(R.string.nitrate_text, firstNitrateValue);
+                nitrateTextView.setText(nitrateText);
+            } else {
+                TextView nitrateTextView = binding.nitrateText;
+                String nitrateText = getString(R.string.nitrate_text, "N/A");
+                nitrateTextView.setText(nitrateText);
+            }
+        });
 
-// Observe the temperature data
-temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperatureList -> {
-    if (temperatureList != null && !temperatureList.isEmpty()) {
-        Map<String, String> firstTemperatureEntry = temperatureList.get(0);
-        String temperatureValue = firstTemperatureEntry.get("temperature");
-        TextView temperatureTextView = binding.temperatureText;
-        // Use resource string with placeholder
-        String temperatureText = getString(R.string.temperature_text, temperatureValue);
-        temperatureTextView.setText(temperatureText);
-    } else {
-        TextView temperatureTextView = binding.temperatureText;
-        String temperatureText = getString(R.string.temperature_text, "N/A");
-        temperatureTextView.setText(temperatureText);
-    }
-});
+
+        // Observe the temperature data
+        temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperatureList -> {
+            if (temperatureList != null && !temperatureList.isEmpty()) {
+                Map<String, String> firstTemperatureEntry = temperatureList.get(0);
+                String temperatureValue = firstTemperatureEntry.get("temperature");
+                TextView temperatureTextView = binding.temperatureText;
+                // Use resource string with placeholder
+                String temperatureText = getString(R.string.temperature_text, temperatureValue);
+                temperatureTextView.setText(temperatureText);
+            } else {
+                TextView temperatureTextView = binding.temperatureText;
+                String temperatureText = getString(R.string.temperature_text, "N/A");
+                temperatureTextView.setText(temperatureText);
+            }
+        });
+
+        // Observe the pH data
+        phViewModel.getPh().observe(getViewLifecycleOwner(), phList -> {
+            if (phList != null && !phList.isEmpty()) {
+                Map<String, String> firstPhEntry = phList.get(0);
+                String phValue = firstPhEntry.get("pH");
+                TextView phTextView = binding.phText;
+                // Use resource string with placeholder
+                String phText = getString(R.string.ph_text, phValue);
+                phTextView.setText(phText);
+            } else {
+                TextView phTextView = binding.phText;
+                String phText = getString(R.string.ph_text, "N/A");
+                phTextView.setText(phText);
+            }
+        });
+
         // Return the root view
         return root;
     }
