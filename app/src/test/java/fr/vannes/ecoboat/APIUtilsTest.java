@@ -77,4 +77,13 @@ public class APIUtilsTest {
                 fail("Exception should not be thrown");
             }
         }
+
+        @Test
+    public void testCalculateWaterQuality() {
+            double temperature = 23.31;
+            double pH = 7.42;
+            double nitrates = 5;
+            int waterQuality = fr.vannes.ecoboat.utils.Utils.calculateWaterQuality(temperature, pH, nitrates);
+            System.out.println("Water quality: " + waterQuality);
+        }
     }

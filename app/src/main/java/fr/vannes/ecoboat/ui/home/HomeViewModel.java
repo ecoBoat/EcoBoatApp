@@ -12,10 +12,19 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import fr.vannes.ecoboat.utils.Utils;
+
 /**
  * ViewModel for the home fragment.
  */
 public class HomeViewModel extends ViewModel {
+
+    // Initialize the temperature value
+    private double temperatureValue;
+    // Initialize the nitrate value
+    private double nitrateValue;
+    // Initialize the pH value
+    private double phValue;
 
     // Live data to store the text
     private final MutableLiveData<String> mText;
@@ -49,28 +58,13 @@ public class HomeViewModel extends ViewModel {
         mText.setValue(text);
 
         mIndex = new MutableLiveData<>();
-        // TODO Change this value with the API value
-        mIndex.setValue(35);
+
+        // Update the water quality index
+        updateWaterQuality();
+
 
         mWaterQualityText = new MutableLiveData<>(); // Initialize the new LiveData
 
-//        // Update the water quality text when the index value changes
-//        Integer indexValue = mIndex.getValue();
-//        if (indexValue == null || indexValue < 0 || indexValue > 100) {
-//            indexValue = 0; // Default value
-//        }
-//
-//        if (indexValue <= 20) {
-//            mWaterQualityText.setValue("Qualité de l'eau : Mauvaise");
-//        } else if (indexValue <= 40) {
-//            mWaterQualityText.setValue("Qualité de l'eau : Moyenne");
-//        } else if (indexValue <= 60) {
-//            mWaterQualityText.setValue("Qualité de l'eau : Bonne");
-//        } else if (indexValue <= 80) {
-//            mWaterQualityText.setValue("Qualité de l'eau : Très bonne");
-//        } else {
-//            mWaterQualityText.setValue("Qualité de l'eau : Excellente");
-//        }
 
         mLocation = new MutableLiveData<>();
 
@@ -78,13 +72,21 @@ public class HomeViewModel extends ViewModel {
         mLocation.setValue("Vannes, Morbihan, France");
 
 
-
         handler.post(updateDateRunnable);
 
     }
 
     /**
+     * Method to update the water quality
+     */
+    public void updateWaterQuality() {
+        int waterQuality = Utils.calculateWaterQuality(temperatureValue, phValue, nitrateValue);
+        mIndex.setValue(waterQuality);
+    }
+
+    /**
      * Getter for the text
+     *
      * @return the LiveData of the text
      */
     public LiveData<String> getText() {
@@ -93,6 +95,7 @@ public class HomeViewModel extends ViewModel {
 
     /**
      * Getter for the index
+     *
      * @return the LiveData of the index
      */
     public LiveData<Integer> getIndex() {
@@ -101,6 +104,7 @@ public class HomeViewModel extends ViewModel {
 
     /**
      * Getter for the water quality text
+     *
      * @return the LiveData of the water quality text
      */
     public LiveData<String> getWaterQualityText() { // Getter for the new LiveData
@@ -109,6 +113,7 @@ public class HomeViewModel extends ViewModel {
 
     /**
      * Getter for the location
+     *
      * @return the LiveData of the location
      */
     public LiveData<String> getLocation() {
@@ -134,6 +139,61 @@ public class HomeViewModel extends ViewModel {
             text += " " + getCurrentDateFormatted();
         }
         mText.setValue(text);
+    }
+
+
+    /**
+     * Getter for the temperature value
+     *
+     * @return the temperature value
+     */
+    public double getTemperatureValue() {
+        return this.temperatureValue;
+    }
+
+    /**
+     * Getter for the pH value
+     *
+     * @return the pH value
+     */
+    public double getPhValue() {
+        return this.phValue;
+    }
+
+    /**
+     * Getter for the nitrate value
+     *
+     * @return the nitrate value
+     */
+    public double getNitrateValue() {
+        return this.nitrateValue;
+    }
+
+    /**
+     * Setter for the temperature value
+     *
+     * @param temperatureValue the temperature value
+     */
+    public void setTemperatureValue(double temperatureValue) {
+        this.temperatureValue = temperatureValue;
+    }
+
+    /**
+     * Setter for the pH value
+     *
+     * @param phValue the pH value
+     */
+    public void setPhValue(double phValue) {
+        this.phValue = phValue;
+    }
+
+    /**
+     * Setter for the nitrate value
+     *
+     * @param nitrateValue the nitrate value
+     */
+    public void setNitrateValue(double nitrateValue) {
+        this.nitrateValue = nitrateValue;
     }
 
     /**

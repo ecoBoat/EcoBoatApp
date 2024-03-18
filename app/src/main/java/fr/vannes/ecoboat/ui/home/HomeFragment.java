@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,10 @@ public class HomeFragment extends Fragment {
 
     // Link the HomeViewModel to the HomeFragment's layout
     private FragmentHomeBinding binding;
+    private double nitrateValue;
+    private double temperatureValue;
+    private double phValue;
+
 
     /**
      * This method is called when the fragment is created.
@@ -52,6 +57,7 @@ public class HomeFragment extends Fragment {
                 new ViewModelProvider(this).get(TemperatureViewModel.class);
         PhViewModel phViewModel =
                 new ViewModelProvider(this).get(PhViewModel.class);
+
 
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -94,16 +100,16 @@ public class HomeFragment extends Fragment {
         // Observe the nitrate data using private method setNitrateText
         nitrateViewModel.getNitrate().observe(getViewLifecycleOwner(), nitrateList -> {
             if (nitrateList != null && !nitrateList.isEmpty()) {
-                String firstNitrateValue = nitrateList.get(0);
-                int nitrateIntValue = Integer.parseInt(firstNitrateValue);
-                if (nitrateIntValue <= 10) {
-                    setNitrateText(firstNitrateValue, Color.GREEN);
-                } else if (nitrateIntValue <= 20) {
-                    setNitrateText(firstNitrateValue, Color.YELLOW);
-                } else if (nitrateIntValue <= 30) {
-                    setNitrateText(firstNitrateValue, Color.RED);
+                this.nitrateValue = Double.parseDouble(nitrateList.get(0));
+                homeViewModel.setNitrateValue(this.nitrateValue); // Set the value in the ViewModel
+                if (nitrateValue <= 10) {
+                    setNitrateText(String.valueOf(nitrateValue), Color.GREEN);
+                } else if (nitrateValue <= 20) {
+                    setNitrateText(String.valueOf(nitrateValue), Color.YELLOW);
+                } else if (nitrateValue <= 30) {
+                    setNitrateText(String.valueOf(nitrateValue), Color.RED);
                 } else {
-                    setNitrateText(firstNitrateValue, Color.BLACK);
+                    setNitrateText(String.valueOf(nitrateValue), Color.BLACK);
                 }
             } else {
                 TextView nitrateTextView = binding.nitrateText;
@@ -111,30 +117,28 @@ public class HomeFragment extends Fragment {
                 nitrateTextView.setText(nitrateText);
                 nitrateTextView.setTextColor(Color.BLACK);
             }
+
+            // Update the water quality and the progress bar
+            homeViewModel.updateWaterQuality();
         });
 
 
-        // Observe the temperature data
+        // Observe the temperature data using private method setTemperatureText
         temperatureViewModel.getTemperature().observe(getViewLifecycleOwner(), temperatureList -> {
             if (temperatureList != null && !temperatureList.isEmpty()) {
                 Map<String, String> firstTemperatureEntry = temperatureList.get(0);
-                String temperatureValue = firstTemperatureEntry.get("temperature");
-                TextView temperatureTextView = binding.temperatureText;
-                // Use resource string with placeholder
-                String temperatureText = getString(R.string.temperature_text, temperatureValue);
-                temperatureTextView.setText(temperatureText);
-
-                // Change the text color based on the temperature value
-                assert temperatureValue != null;
-                int temperatureIntValue = (int) Float.parseFloat(temperatureValue);
-                if (temperatureIntValue <= 10) {
-                    temperatureTextView.setTextColor(Color.GREEN);
-                } else if (temperatureIntValue <= 20) {
-                    temperatureTextView.setTextColor(Color.YELLOW);
-                } else if (temperatureIntValue <= 30) {
-                    temperatureTextView.setTextColor(Color.RED);
+                String temperatureValueString = firstTemperatureEntry.get("temperature");
+                assert temperatureValueString != null;
+                this.temperatureValue = Double.parseDouble(temperatureValueString);
+                homeViewModel.setTemperatureValue(this.temperatureValue); // Set the value in the ViewModel
+                if (temperatureValue <= 10) {
+                    setTemperatureText(temperatureValueString, Color.GREEN);
+                } else if (temperatureValue <= 20) {
+                    setTemperatureText(temperatureValueString, Color.YELLOW);
+                } else if (temperatureValue <= 30) {
+                    setTemperatureText(temperatureValueString, Color.RED);
                 } else {
-                    temperatureTextView.setTextColor(Color.BLACK);
+                    setTemperatureText(temperatureValueString, Color.BLACK);
                 }
             } else {
                 TextView temperatureTextView = binding.temperatureText;
@@ -142,33 +146,58 @@ public class HomeFragment extends Fragment {
                 temperatureTextView.setText(temperatureText);
                 temperatureTextView.setTextColor(Color.BLACK);
             }
+
+            // Update the water quality and the progress bar
+            homeViewModel.updateWaterQuality();
         });
 
-        // Observe the pH data
+
+        // Observe the pH data using private method setPhText
         phViewModel.getPh().observe(getViewLifecycleOwner(), phList -> {
             if (phList != null && !phList.isEmpty()) {
                 Map<String, String> firstPhEntry = phList.get(0);
-                String phValue = firstPhEntry.get("pH");
-                TextView phTextView = binding.phText;
-                // Use resource string with placeholder
-                String phText = getString(R.string.ph_text, phValue);
-                phTextView.setText(phText);
-
-                // Change the text color based on the pH value
-                assert phValue != null;
-                float phFloatValue = Float.parseFloat(phValue);
-                if (phFloatValue < 7) {
-                    phTextView.setTextColor(Color.RED); // Acidic - Red
-                } else if (phFloatValue == 7) {
-                    phTextView.setTextColor(Color.GREEN); // Neutral - Green
+                String phValueString = firstPhEntry.get("pH");
+                assert phValueString != null;
+                this.phValue = Double.parseDouble(phValueString);
+                homeViewModel.setPhValue(this.phValue); // Set the value in the ViewModel
+                if (phValue < 7) {
+                    setPhText(phValueString, Color.RED); // Acidic - Red
+                } else if (phValue == 7) {
+                    setPhText(phValueString, Color.GREEN); // Neutral - Green
                 } else {
-                    phTextView.setTextColor(Color.BLUE); // Alkaline - Blue
+                    setPhText(phValueString, Color.BLUE); // Alkaline - Blue
                 }
             } else {
                 TextView phTextView = binding.phText;
                 String phText = getString(R.string.ph_text, "N/A");
                 phTextView.setText(phText);
                 phTextView.setTextColor(Color.BLACK);
+            }
+
+            // Update the water quality and the progress bar
+            homeViewModel.updateWaterQuality();
+        });
+
+        // Button to refresh the data
+        binding.refreshButton.setBackgroundResource(R.drawable.cell_border);
+        binding.refreshButton.setOnClickListener(v -> {
+            try {
+                Log.d("HomeFragment", "Refresh button clicked, fetching data");
+
+                // Fetch nitrate data
+                nitrateViewModel.fetchNitrate();
+
+                // Fetch temperature data
+                temperatureViewModel.fetchTemperature();
+
+                // Fetch pH data
+                phViewModel.fetchPh();
+
+                // Update the water quality and the progress bar
+                homeViewModel.updateWaterQuality();
+
+            } catch (Exception e) {
+                Log.e("HomeFragment", "Error fetching data: " + e);
             }
         });
 
@@ -197,7 +226,6 @@ public class HomeFragment extends Fragment {
      * Method to set the nitrate text with a specific color
      *
      * @param nitrateValue the nitrate value
-     * @param colorWord    the color word
      * @param color        the color
      */
     private void setNitrateText(String nitrateValue, int color) {
@@ -211,6 +239,64 @@ public class HomeFragment extends Fragment {
         }
         nitrateTextView.setText(spannable);
     }
+
+    private void setTemperatureText(String temperatureValue, int color) {
+        TextView temperatureTextView = binding.temperatureText;
+        String temperatureText = getString(R.string.temperature_text, temperatureValue);
+        SpannableString spannable = new SpannableString(temperatureText);
+        int start = temperatureText.indexOf(temperatureValue);
+        if (start != -1) { // Only setSpan if temperatureValue is found in temperatureText
+            int end = start + temperatureValue.length();
+            spannable.setSpan(new ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        temperatureTextView.setText(spannable);
+    }
+
+    /**
+     * Method to set the pH text with a specific color
+     *
+     * @param phValue the pH value
+     * @param color   the color
+     */
+    private void setPhText(String phValue, int color) {
+        TextView phTextView = binding.phText;
+        String phText = getString(R.string.ph_text, phValue);
+        SpannableString spannable = new SpannableString(phText);
+        int start = phText.indexOf(phValue);
+        if (start != -1) { // Only setSpan if phValue is found in phText
+            int end = start + phValue.length();
+            spannable.setSpan(new ForegroundColorSpan(color), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        phTextView.setText(spannable);
+    }
+
+    /**
+     * Getter for the temperature value
+     *
+     * @return the temperature value
+     */
+    public double getTemperatureValue() {
+        return this.temperatureValue;
+    }
+
+    /**
+     * Getter for the pH value
+     *
+     * @return the pH value
+     */
+    public double getPhValue() {
+        return this.phValue;
+    }
+
+    /**
+     * Getter for the nitrate value
+     *
+     * @return the nitrate value
+     */
+    public double getNitrateValue() {
+        return this.nitrateValue;
+    }
+
 
     /**
      * This method is called when the fragment's view is destroyed.

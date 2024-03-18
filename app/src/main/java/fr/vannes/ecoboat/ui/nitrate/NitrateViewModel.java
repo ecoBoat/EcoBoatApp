@@ -65,7 +65,7 @@ public class NitrateViewModel extends ViewModel {
      * Method to fetch the nitrate from the API with the APIUtils getNitrate method
      * todo in the future we will use the APIUtils.getNitrate method
      */
-    protected void fetchNitrate() {
+    public void fetchNitrate() {
     // Create a fixed array of nitrate values
     String[] fixedNitrateValues = {"5", "8", "10", "12", "15", "18", "20", "22", "25", "28", "30", "32", "35", "38", "40", "42", "45", "48", "50", "55"};
 

@@ -69,7 +69,7 @@ public class TemperatureViewModel extends ViewModel {
      * Method to fetch the temperature from the API
      * with the APIUtils getTemperature method
      */
-    protected void fetchTemperature() {
+    public void fetchTemperature() {
         // Create a new thread to fetch the temperature from the API
         new Thread(() -> {
             APIUtils apiUtils = new APIUtils();
