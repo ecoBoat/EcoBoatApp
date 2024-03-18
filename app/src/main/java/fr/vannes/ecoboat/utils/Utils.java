@@ -6,27 +6,50 @@ package fr.vannes.ecoboat.utils;
 public class Utils {
     
     /**
-     * Method to calculate the water quality
-     * @param temperature The temperature
-     * @param pH The pH
-     * @param nitrates The nitrates
-     * @return The water quality
+     * Calculate the water quality
+     * @param temperature the temperature
+     * @param pH the pH
+     * @param nitrates the nitrates
+     * @return the water quality
      */
     public static int calculateWaterQuality(double temperature, double pH, double nitrates) {
-    // Temperature normalisation
-    double T = (temperature - 10) / (35 - 10);
+        double penalty = 0;
 
-    // pH normalisation
-    double P = 1 - Math.abs(pH - 7) / 7;
+        // Temperature normalisation
+        double T;
+        if (temperature >= 8 && temperature <= 18) {
+            T = 1;
+        } else if (temperature < 8) {
+            T = Math.max(0, 1 - Math.pow((8 - temperature) / 8, 2));
+            penalty += 0.1 * ((8 - temperature) / 8);
+        } else {
+            T = Math.max(0, 1 - Math.pow((temperature - 18) / 12, 2));
+            penalty += 0.1 * ((temperature - 18) / 12);
+        }
 
-    // Nitrates normalisation
-    double N = 1 - (nitrates / 50);
+        // pH normalisation
+        double P = 1 - Math.pow((pH - 7) / 7, 2);
+        if (pH < 6 || pH > 8) {
+            penalty += 0.1 * (Math.abs(pH - 7) / 7);
+        }
 
-    // Water quality calculation
-    double waterQuality = ((T + P + N) / 3) * 100;
+        // Nitrate normalisation
+        double N;
+        if (nitrates <= 10) {
+            N = (20 - nitrates) / 20;
+        } else {
+            N = Math.max(0, 1 - Math.pow((nitrates - 10) / 20, 2));
+            penalty += 0.1 * ((nitrates - 10) / 20);
+        }
 
-    // Return Math round to get the water quality as an integer
-    return (int) Math.round(waterQuality);
-}
+        // Calculating the water quality
+        double waterQuality = ((T + P + N) / 3) * 100;
+
+        // Penalizing the water quality
+        waterQuality *= (1 - penalty);
+
+        // Return the water quality to an integer
+        return (int) Math.round(waterQuality);
+    }
     
 }

@@ -21,6 +21,7 @@
     <string name="eau_bonne">Qualité de l\'eau : Bonne</string>
     <string name="tres_bonne">Qualité de l\'eau : Très bonne</string>
     <string name="eau_excellente">Qualité de l\'eau : Excellente</string>
+    <string name="location_permission_denied">Permission de localisation refusée</string>
 
 
 </resources>

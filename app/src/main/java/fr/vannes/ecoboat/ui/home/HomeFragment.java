@@ -350,7 +350,7 @@ public class HomeFragment extends Fragment {
                 Address address = addresses.get(0);
                 String city = address.getLocality();
                 String country = address.getCountryName();
-                String locationString = city + country;
+                String locationString = city +", "+ country;
 
                 HomeViewModel homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
                 Log.d("HomeFragment", "Setting location: " + locationString);
@@ -378,7 +378,8 @@ public class HomeFragment extends Fragment {
                 if (isGranted) {
                     getLastLocation();
                 } else {
-                    Toast.makeText(requireActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                    TextView locationTextView = binding.locationText;
+                    locationTextView.setText(R.string.location_permission_denied);
                 }
             });
 
