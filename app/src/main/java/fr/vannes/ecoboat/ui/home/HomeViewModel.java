@@ -2,6 +2,7 @@ package fr.vannes.ecoboat.ui.home;
 
 import android.os.Build;
 import android.os.Handler;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -67,9 +68,10 @@ public class HomeViewModel extends ViewModel {
 
 
         mLocation = new MutableLiveData<>();
-
-        // TODO Change this value with the API value
-        mLocation.setValue("Vannes, Morbihan, France");
+//
+//        // TODO Change this value with the API value
+//        mLocation.setValue("Vannes, Morbihan, France");
+//        mLocation.setValue(this.getLocation().getValue());
 
 
         handler.post(updateDateRunnable);
@@ -169,6 +171,8 @@ public class HomeViewModel extends ViewModel {
         return this.nitrateValue;
     }
 
+
+
     /**
      * Setter for the temperature value
      *
@@ -195,6 +199,18 @@ public class HomeViewModel extends ViewModel {
     public void setNitrateValue(double nitrateValue) {
         this.nitrateValue = nitrateValue;
     }
+
+    /**
+     * Setter for the location
+     *
+     * @param location the location
+     */
+    public void setLocation(String location) {
+        Log.d("HomeViewModel", "Setting location: " + location); // Log the location value
+        mLocation.setValue(location);
+    }
+
+
 
     /**
      * Stop the updates when the ViewModel is cleared

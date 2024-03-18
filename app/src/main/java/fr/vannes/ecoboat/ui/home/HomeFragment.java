@@ -1,6 +1,10 @@
 package fr.vannes.ecoboat.ui.home;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -12,10 +16,18 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import fr.vannes.ecoboat.R;
@@ -24,13 +36,27 @@ import fr.vannes.ecoboat.ui.nitrate.NitrateViewModel;
 import fr.vannes.ecoboat.ui.ph.PhViewModel;
 import fr.vannes.ecoboat.ui.temperature.TemperatureViewModel;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+
+import android.location.Location;
+import android.widget.Toast;
+
 public class HomeFragment extends Fragment {
 
     // Link the HomeViewModel to the HomeFragment's layout
     private FragmentHomeBinding binding;
+    // Initialize the nitrate value
     private double nitrateValue;
+    // Initialize the temperature value
     private double temperatureValue;
+    // Initialize the pH value
     private double phValue;
+    // Request code for location permission
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    // FusedLocationProviderClient to get the last location
+    private FusedLocationProviderClient fusedLocationClient;
 
 
     /**
@@ -57,7 +83,6 @@ public class HomeFragment extends Fragment {
                 new ViewModelProvider(this).get(TemperatureViewModel.class);
         PhViewModel phViewModel =
                 new ViewModelProvider(this).get(PhViewModel.class);
-
 
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
@@ -89,13 +114,7 @@ public class HomeFragment extends Fragment {
                 setWaterQualityText(indexValue, String.valueOf(R.string.eau_excellente), "Excellente", Color.MAGENTA);
             }
         });
-        ;
 
-        // Get the location from the layout
-        homeViewModel.getLocation().observe(getViewLifecycleOwner(), location -> {
-            TextView locationTextView = binding.locationText;
-            locationTextView.setText(location);
-        });
 
         // Observe the nitrate data using private method setNitrateText
         nitrateViewModel.getNitrate().observe(getViewLifecycleOwner(), nitrateList -> {
@@ -201,8 +220,33 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION_PERMISSION);
+        } else {
+            getLastLocation();
+        }
+
         // Return the root view
         return root;
+    }
+
+    /**
+     * This method is called when the fragment's view is already created.
+     *
+     * @param view               The view returned by onCreateView
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     */
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        } else {
+            getLastLocation();
+        }
     }
 
     /**
@@ -240,6 +284,12 @@ public class HomeFragment extends Fragment {
         nitrateTextView.setText(spannable);
     }
 
+    /**
+     * Method to set the temperature text with a specific color
+     *
+     * @param temperatureValue the temperature value
+     * @param color            the color
+     */
     private void setTemperatureText(String temperatureValue, int color) {
         TextView temperatureTextView = binding.temperatureText;
         String temperatureText = getString(R.string.temperature_text, temperatureValue);
@@ -271,31 +321,66 @@ public class HomeFragment extends Fragment {
     }
 
     /**
-     * Getter for the temperature value
-     *
-     * @return the temperature value
+     * Method to get the last location
      */
-    public double getTemperatureValue() {
-        return this.temperatureValue;
+    private void getLastLocation() {
+        if (ActivityCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(location -> {
+                        if (location != null && isAdded()) {
+                            double latitude = location.getLatitude();
+                            double longitude = location.getLongitude();
+                            convertCoordinatesToLocation(latitude, longitude);
+                        }
+                    });
+        }
     }
 
     /**
-     * Getter for the pH value
+     * Method to convert coordinates to location
      *
-     * @return the pH value
+     * @param latitude  the latitude
+     * @param longitude the longitude
      */
-    public double getPhValue() {
-        return this.phValue;
+    private void convertCoordinatesToLocation(double latitude, double longitude) {
+        Geocoder geocoder = new Geocoder(requireActivity(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                String city = address.getLocality();
+                String country = address.getCountryName();
+                String locationString = city + country;
+
+                HomeViewModel homeViewModel = new ViewModelProvider(requireActivity()).get(HomeViewModel.class);
+                Log.d("HomeFragment", "Setting location: " + locationString);
+                homeViewModel.setLocation(locationString);
+                Log.d("HomeFragment", "Location: " + locationString);
+
+                homeViewModel.getLocation().observe(getViewLifecycleOwner(), observedLocation -> {
+                    Log.d("HomeFragment", "Observed location: " + observedLocation);
+                    TextView locationTextView = binding.locationText;
+                    locationTextView.setText(observedLocation);
+                });
+            } else {
+                Log.d("Location", "Unable to find location");
+            }
+        } catch (IOException e) {
+            Log.e("Location", "Unable to geocode location", e);
+        }
     }
 
     /**
-     * Getter for the nitrate value
-     *
-     * @return the nitrate value
+     * Activity result launcher for requesting location permission
      */
-    public double getNitrateValue() {
-        return this.nitrateValue;
-    }
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    getLastLocation();
+                } else {
+                    Toast.makeText(requireActivity(), "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+            });
 
 
     /**
