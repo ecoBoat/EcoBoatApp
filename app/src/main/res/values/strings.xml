@@ -16,6 +16,11 @@
     <string name="menu_temperature">Température</string>
     <string name="menu_ph">pH</string>
     <string name="update">Mettre à jour</string>
+    <string name="eau_mauvaise">Qualité de l\'eau : Mauvaise</string>
+    <string name="eau_moyenne">Qualité de l\'eau : Moyenne</string>
+    <string name="eau_bonne">Qualité de l\'eau : Bonne</string>
+    <string name="tres_bonne">Qualité de l\'eau : Très bonne</string>
+    <string name="eau_excellente">Qualité de l\'eau : Excellente</string>
 
 
 </resources>

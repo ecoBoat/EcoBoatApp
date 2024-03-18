@@ -54,23 +54,23 @@ public class HomeViewModel extends ViewModel {
 
         mWaterQualityText = new MutableLiveData<>(); // Initialize the new LiveData
 
-        // Update the water quality text when the index value changes
-        Integer indexValue = mIndex.getValue();
-        if (indexValue == null || indexValue < 0 || indexValue > 100) {
-            indexValue = 0; // Default value
-        }
-
-        if (indexValue <= 20) {
-            mWaterQualityText.setValue("Qualité de l'eau : Mauvaise");
-        } else if (indexValue <= 40) {
-            mWaterQualityText.setValue("Qualité de l'eau : Moyenne");
-        } else if (indexValue <= 60) {
-            mWaterQualityText.setValue("Qualité de l'eau : Bonne");
-        } else if (indexValue <= 80) {
-            mWaterQualityText.setValue("Qualité de l'eau : Très bonne");
-        } else {
-            mWaterQualityText.setValue("Qualité de l'eau : Excellente");
-        }
+//        // Update the water quality text when the index value changes
+//        Integer indexValue = mIndex.getValue();
+//        if (indexValue == null || indexValue < 0 || indexValue > 100) {
+//            indexValue = 0; // Default value
+//        }
+//
+//        if (indexValue <= 20) {
+//            mWaterQualityText.setValue("Qualité de l'eau : Mauvaise");
+//        } else if (indexValue <= 40) {
+//            mWaterQualityText.setValue("Qualité de l'eau : Moyenne");
+//        } else if (indexValue <= 60) {
+//            mWaterQualityText.setValue("Qualité de l'eau : Bonne");
+//        } else if (indexValue <= 80) {
+//            mWaterQualityText.setValue("Qualité de l'eau : Très bonne");
+//        } else {
+//            mWaterQualityText.setValue("Qualité de l'eau : Excellente");
+//        }
 
         mLocation = new MutableLiveData<>();
 
